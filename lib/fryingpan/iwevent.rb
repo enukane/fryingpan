@@ -61,8 +61,13 @@ module FryingPan
 
     def stop
       @stop_requested = true
-      if @th_iw
-        Process.kill("INT", @th_iw.pid)
+      if @th_iw and @th_
+        begin
+          Process.kill("INT", @th_iw.pid)
+        rescue Errno::ESRCH
+          # already dead, leave as is
+        rescue => e
+        end
       end
     end
 

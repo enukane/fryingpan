@@ -1,8 +1,10 @@
-class FryingPan
+module FryingPan
   require "erb"
   require "thread"
   require "open3"
   require "tempfile"
+
+  require "fryingpan/log"
 
   class DHCPd
     DNSMASQ_CONFIG_FMT=<<FMT
@@ -23,7 +25,8 @@ FMT
     def self.default_options
       {
         :ifname => "wlan0",
-        :addr=> "172.16.0.1",
+        :addr => "172.16.0.1",
+        :netmask => 16,
         :start_addr => "172.16.0.2",
         :end_addr => "172.16.255.254",
         :lease => "24h",
@@ -49,6 +52,7 @@ FMT
 
       @ifname = args[:ifname]
       @addr = args[:addr]
+      @netmask = args[:netmask]
       @start_addr = args[:start_addr]
       @end_addr = args[:end_addr]
       @lease = args[:lease]
@@ -62,7 +66,11 @@ FMT
       @th_do_run = Thread.new do
         conf_file = create_config_file
         dp "conf_file path => #{conf_file.path}"
-        start_dnsmasq(conf_file.path)
+        begin
+          start_dnsmasq(conf_file.path)
+        rescue => e
+          $log.err "failed to start dnsmasq (#{e})"
+        end
       end
 
       unless async
@@ -98,6 +106,8 @@ FMT
     end
 
     def start_dnsmasq conf_path
+      system("ip addr add #{@addr}/#{@netmask} dev #{@ifname}")
+
       stdin, stdout, stderr, @th_dnsmasq = *Open3.popen3(
         "dnsmasq -d -I lo -z -h -i #{@ifname} -C #{conf_path} -q"
       )
@@ -148,8 +158,8 @@ FMT
         ifname = $1
         ipaddr = $2
         macaddr = $3
-        hostnaem = $4
-        handle_dhcp_event(:ack, ifname, macaddr, ipaddr, hosname)
+        hostname = $4
+        handle_dhcp_event(:ack, ifname, macaddr, ipaddr, hostname)
       when REG_QUERY
         record = $1
         name = $2

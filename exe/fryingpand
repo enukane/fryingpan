@@ -1,0 +1,54 @@
+#!/usr/bin/env ruby
+
+require "optparse"
+require "fryingpan"
+
+# fryingpand -c [channel] -i [interface] -s [ssid] -l [log path]
+
+opt = OptionParser.new
+OPTS= FryingPan::Daemon.default_options
+
+
+opt.on("-i", "--interface [IFNAME=#{FryingPan::Daemon::DEFAULT_IFNAME}]",
+       "interface name to capture") {|v|
+         OPTS[:ifname] = v
+}
+
+opt.on("-c", "--channel [CHAN=#{FryingPan::Daemon::DEFAULT_CHANNEL}]",
+       "channel for AP") {|v|
+         OPTS[:chan] = v.to_i
+}
+
+opt.on("-s", "--ssid [SSID=#{FryingPan::Daemon::DEFAULT_SSID}]",
+       "SSID for AP") {|v|
+         OPTS[:ssid] = v
+}
+
+opt.on("-l", "--log-path [LOGPATH=#{FryingPan::Daemon::DEFAULT_LOG_PATH}]",
+       "log directory") {|v|
+         OPTS[:log_path] = v
+}
+
+(class<<self;self;end).module_eval do
+  define_method(:usage) do |msg|
+    puts opt.to_s
+    puts "error: #{msg}" if msg
+    exit 1
+  end
+end
+
+begin
+  rest = opt.parse(ARGV)
+  if rest.length != 0
+    usage nil
+  end
+rescue
+  usage $!.to_s
+end
+
+Signal.trap("INT") do |signo|
+  FryingPan::APIServer.quit!
+end
+
+FryingPan::APIServer.run!(OPTS)
+
