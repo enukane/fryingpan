@@ -2,7 +2,7 @@ class Log
   require "logger"
   def initialize opts={}
     @debug_mode = opts[:debug_mode] || false
-    @output = opts[:output] || STDOUT
+    @output = opts[:output] || "STDOUT"
 
     case @output
     when "STDOUT"
@@ -35,4 +35,4 @@ class Log
   end
 end
 
-$log = Log.new
+$log = Log.new(:output => "STDOUT")
