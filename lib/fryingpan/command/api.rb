@@ -48,7 +48,7 @@ module FryingPan
       end
     end
 
-    get "/api/v1/start" do
+    post "/api/v1/start" do
       #  {
       #     :channel => n
       #  }
@@ -63,19 +63,23 @@ module FryingPan
         # TODO: start daemon
         opts = FryingPan::Daemon.default_options
         opts[:ifname] = @@args[:ifname]
-        opts[:channel] = json[:channel]
+        opts[:channel] = json[:channel] || @@args[:channel]
+
+        @@daemon = FryingPan::Daemon.new(opts)
 
         @@daemon.run
 
         status 200
         "success"
       rescue => e
+        $log.err "failed to start daemon (#{e})"
+
         status 500
         "failed (#{e})"
       end
     end
 
-    get "/api/v1/stop" do
+    post "/api/v1/stop" do
       begin
         unless @@daemon
           raise "not running"
@@ -88,6 +92,8 @@ module FryingPan
         status 200
         "success"
       rescue => e
+        $log.err "failed to stop daemon (#{e})"
+
         status 500
         "failed (#{e})"
       end
