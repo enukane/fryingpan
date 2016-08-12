@@ -50,5 +50,13 @@ Signal.trap("INT") do |signo|
   FryingPan::APIServer.quit!
 end
 
+log_path = nil
+if OPTS[:log_path].match(/^(STDOUT|STDERR)$/)
+  log_path = OPTS[:log_path]
+else
+  log_path = OPTS[:log_path] + "/event.log"
+end
+
+$log = Log.new(:output => log_path)
 FryingPan::APIServer.run!(OPTS)
 
