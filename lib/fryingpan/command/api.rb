@@ -1,5 +1,5 @@
 module FryingPan
-  require "fryingpan/command/daemon"
+  require "fryingpan/command/fryingpand"
   require "fryingpan/hostap"
   require "fryingpan/dhcp"
   require "fryingpan/iwevent"
