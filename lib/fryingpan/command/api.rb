@@ -62,8 +62,10 @@ module FryingPan
 
         # TODO: start daemon
         opts = FryingPan::Daemon.default_options
+        opts[:ssid] = @@args[:ssid]
         opts[:ifname] = @@args[:ifname]
         opts[:channel] = json[:channel] || @@args[:channel]
+        opts[:log_path] = @@args[:log_path]
 
         @@daemon = FryingPan::Daemon.new(opts)
 
