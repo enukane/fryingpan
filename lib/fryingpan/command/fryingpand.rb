@@ -131,7 +131,7 @@ module FryingPan
       @dhcp.register_dhcp_event do |type, ifname, macaddr, ipaddr, hostname|
         $log.info "DHCP:\t#{type} at #{ifname} from #{macaddr} (hostname=#{hostname}) assigned #{ipaddr}"
         @stats.add_event({
-          :type => FryingPan::Stats::EVENT_TYPE_DHCPASSIGN,
+          :type => FryingPan::Stats::EVENT_TYPE_DHCP_ASSIGN,
           :dhcp_type => type,
           :ifname => ifname,
           :macaddr => macaddr,
@@ -158,7 +158,7 @@ module FryingPan
 
       # connected
       @iwevent.register_connected do |time, ifname, addr|
-        $log.info "WLAN-A:\t#{addr} leaves from #(ifname) (time=#{time})"
+        $log.info "WLAN-A:\t#{addr} joins  #{ifname} (time=#{time})"
         @stats.add_event({
           :type => FryingPan::Stats::EVENT_TYPE_WLAN_ASSOC,
           :ifname => ifname,
