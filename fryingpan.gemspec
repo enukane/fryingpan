@@ -8,8 +8,8 @@ Gem::Specification.new do |spec|
   spec.version       = Fryingpan::VERSION
   spec.authors       = ["nkaneko"]
   spec.email         = ["nkaneko@iij.ad.jp"]
-  spec.summary       = %q{TODO: Write a short summary. Required.}
-  spec.description   = %q{TODO: Write a longer description. Optional.}
+  spec.summary       = %q{HoneyPot AP on Raspberry Pi}
+  spec.description   = %q{Wi-Fi HoneyPot Builder}
   spec.homepage      = ""
   spec.license       = "MIT"
 
