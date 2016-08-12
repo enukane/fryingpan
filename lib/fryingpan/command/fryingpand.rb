@@ -63,6 +63,8 @@ module FryingPan
     end
 
     def run
+      @stats = FryingPan::Stats.new(@args)
+
       # setup system
       prepare_system
 
@@ -90,10 +92,12 @@ module FryingPan
         FryingPan::HTTPGateway.quit!
         @th_httpgw = nil
       end
+
+      @stats.dump
     end
 
     def status
-      # TODO:
+      return @stats.status()
     end
 
     def prepare_system
@@ -125,13 +129,25 @@ module FryingPan
       @dhcp = FryingPan::DHCPd.new(opts)
 
       @dhcp.register_dhcp_event do |type, ifname, macaddr, ipaddr, hostname|
-        #  TODO:
         $log.info "DHCP:\t#{type} at #{ifname} from #{macaddr} (hostname=#{hostname}) assigned #{ipaddr}"
+        @stats.add_event({
+          :type => FryingPan::Stats::EVENT_TYPE_DHCPASSIGN,
+          :dhcp_type => type,
+          :ifname => ifname,
+          :macaddr => macaddr,
+          :ipaddr => ipaddr,
+          :hostname => hostname,
+        })
       end
 
       @dhcp.register_dns_event do |type, name, record, ipaddr|
-        # TODO:
         $log.info "DNS:\t#{type} name=#{name} record=#{record} from #{ipaddr}"
+        @stats.add_event({
+          :type => FryingPan::Stats::EVENT_TYPE_DNS_QUERY,
+          :name => name,
+          :record => record,
+          :ipaddr => ipaddr,
+        })
       end
 
       @dhcp.run(true) # async
@@ -142,14 +158,22 @@ module FryingPan
 
       # connected
       @iwevent.register_connected do |time, ifname, addr|
-        # TODO:
         $log.info "WLAN-A:\t#{addr} leaves from #(ifname) (time=#{time})"
+        @stats.add_event({
+          :type => FryingPan::Stats::EVENT_TYPE_WLAN_ASSOC,
+          :ifname => ifname,
+          :macaddr => addr,
+        })
       end
 
       # disconnected
       @iwevent.register_disconnected do |time, ifname, addr|
-        # TODO:
         $log.info "WLAN-D:\t#{addr} leaves from #(ifname) (time=#{time})"
+        @stats.add_event({
+          :type => FryingPan::Stats::EVENT_TYPE_WLAN_DISASSOC,
+          :ifname => ifname,
+          :macaddr => addr,
+        })
       end
 
       @iwevent.run(true) # async
@@ -160,14 +184,18 @@ module FryingPan
       opts[:port] = @http_port
 
       FryingPan::HTTPGateway.register_handler do |method, addr, uri, agent|
-        # TODO:
         $log.info "HTTP:\t#{addr} does #{method} to #{uri} (agent=#{agent})"
+        @stats.add_event({
+          :type => FryingPan::Stats::EVENT_TYPE_HTTP_ACCESS,
+          :ipaddr => addr,
+          :uri => uri,
+          :agent => agent,
+        })
       end
 
       @th_httpgw = Thread.new do
         FryingPan::HTTPGateway.run!(opts)
       end
     end
-
   end
 end
