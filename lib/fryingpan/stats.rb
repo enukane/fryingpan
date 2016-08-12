@@ -1,5 +1,6 @@
 module FryingPan
   require "fryingpan/log"
+  require "fryingpan/stats"
   require "json"
 
   class Stats
@@ -22,7 +23,7 @@ module FryingPan
     end
 
     def status
-      return @status
+      return @info_table
     end
 
     def add_event args={}
@@ -123,7 +124,7 @@ module FryingPan
       agent = args[:agent]
 
       macaddr = ipaddr2macaddr(ipaddr)
-      info = get_i9nfo_entry(macaddr)
+      info = get_info_entry(macaddr)
       return unless info
 
       info[:http_access_count] += 1
