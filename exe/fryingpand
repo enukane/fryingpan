@@ -16,7 +16,7 @@ opt.on("-i", "--interface [IFNAME=#{FryingPan::Daemon::DEFAULT_IFNAME}]",
 
 opt.on("-c", "--channel [CHAN=#{FryingPan::Daemon::DEFAULT_CHANNEL}]",
        "channel for AP") {|v|
-         OPTS[:chan] = v.to_i
+         OPTS[:channel] = v.to_i
 }
 
 opt.on("-s", "--ssid [SSID=#{FryingPan::Daemon::DEFAULT_SSID}]",
