@@ -77,7 +77,7 @@ module FryingPan
 
       info[:dhcp_event_count] += 1
 
-      unless args[:dhcp_type] != :ack
+      unless args[:dhcp_type] == :ack
         update_info_entry(macaddr, info)
         return
       end
@@ -134,7 +134,7 @@ module FryingPan
       info[:http_accessed_uris].uniq!
 
       if agent
-        info[:http_agents] << agents
+        info[:http_agents] << agent
       end
       info[:http_agents].uniq!
 
