@@ -87,7 +87,7 @@ function update_status(json) {
                 }
                 update_status(json);
             }
-            setTimeout(worker, 500);
+            setTimeout(worker, 5000);
         }
     });
 })();
