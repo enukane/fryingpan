@@ -11,10 +11,11 @@ module FryingPan
 
   class APIServer < Sinatra::Base
     DEFAULT_CONTROL_PORT=8080
-    DEFAULT_PUBLIC_FOLDER = File.dirname(__FILE__) + "/../../extra/public/ctrl"
+    DEFAULT_PUBLIC_FOLDER = File.dirname(__FILE__) + "/../../../extra/public/ctrl"
 
 
     # set :bind, "127.0.0.1"  # only for myself
+    set :bind, "127.0.0.1"
     set :bind, "192.168.0.157"
     set :port, DEFAULT_CONTROL_PORT
     set :public_folder, DEFAULT_PUBLIC_FOLDER
